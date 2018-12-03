@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace GeometricLayouts.Models
 {
-    public struct Triangle
+    public class Triangle
     {
         private Point _vertex1;
         private Point _vertex2;
