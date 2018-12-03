@@ -51,9 +51,7 @@ namespace GeometricLayouts.Controllers
         public ActionResult<string> Post([FromBody] Triangle t)
         {
             //Validate Triangle
-            bool valid = _triangleMapCalculator.TriangleIsValid(t);
-
-            if(valid)
+            if(t.IsIsoscelesRightTriangle())
             { 
                 MapReference mapReference = 
                     _triangleMapCalculator.CalculateMapReferenceFromCoordinates(t);

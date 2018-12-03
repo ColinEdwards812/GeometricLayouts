@@ -39,5 +39,29 @@ namespace GeometricLayouts.Models
             _vertex3.Offset(x, y);
         }
 
+        public bool IsIsoscelesRightTriangle()
+        {
+            //If vertex 3 > 2 we have a left triangle
+            //else a right reflected triangle
+            if (_vertex3.X > _vertex2.X)
+            {
+                bool isValid = (_vertex1.X == _vertex2.X)
+                               && (_vertex1.X == _vertex3.X - 10)
+                               && (_vertex1.Y == _vertex3.Y)
+                               && (_vertex1.Y == _vertex2.Y + 10);
+
+                return isValid;
+            }
+            else
+            {
+                bool isValid = (_vertex1.X == _vertex2.X)
+                               && (_vertex1.X == _vertex3.X + 10)
+                               && (_vertex1.Y == _vertex3.Y)
+                               && (_vertex1.Y == _vertex2.Y - 10);
+
+                return isValid;
+            }
+        }
+
     }
 }

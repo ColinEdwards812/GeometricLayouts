@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using GeometricLayouts.Controllers;
+using GeometricLayouts.Interfaces;
 using GeometricLayouts.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -12,11 +14,42 @@ namespace GeometricLayoutsTests
     public class ValidationTests
     {
         private TriangleController _controller;
+        private TriangleMapCalculator _triangleMapCalculator;
 
+#region SetUpTests
         public ValidationTests()
         {
-           _controller = new TriangleController(new TriangleMapCalculator());
+            _triangleMapCalculator = new TriangleMapCalculator();
+           _controller = new TriangleController(_triangleMapCalculator);
         }
+
+        public List<MapReference> ValidMapValuesForLeftTriangle()
+        {
+            return new List<MapReference>
+            {
+                new MapReference('A',1),
+                new MapReference('B',1),
+                new MapReference('B',3),
+                new MapReference('E',5),
+                new MapReference('E',7),
+                new MapReference('E',11)
+            };
+        }
+
+        public List<MapReference> ValidMapValuesForRightTriangle()
+        {
+            return new List<MapReference>
+            {
+                new MapReference('A',2),
+                new MapReference('B',2),
+                new MapReference('B',6),
+                new MapReference('D',8),
+                new MapReference('F',8),
+                new MapReference('E',10)
+            };
+        }
+
+#endregion SetUpTests
 
         [TestMethod]
         public void When_MapReferenceInputIsInvalid_ReturnsBadRequest()
@@ -60,7 +93,7 @@ namespace GeometricLayoutsTests
             Point b = new Point(0, 0);
             Point c = new Point(WIDTH, WIDTH);
 
-            //Check Left facing
+            //Check left facing
             Triangle triangleLeft = new Triangle(a,b,c);
             ////Act
             ActionResult<string> response = _controller.Post(triangleLeft);
@@ -72,13 +105,13 @@ namespace GeometricLayoutsTests
         public void When_RightTriangleInputWidthIsInvalid_ReturnsBadRequest()
         {
             ////Arrange
-            const int WIDTH = 12;
+            const int WIDTH = 9;
 
             Point a = new Point(WIDTH, 0);
             Point b = new Point(WIDTH, WIDTH);
             Point c = new Point(0, 0);
             
-            //Check Right facing
+            //Check right facing
             Triangle triangleRight = new Triangle(a,b,c);
             ////Act
             ActionResult<string> response = _controller.Post(triangleRight);
@@ -87,39 +120,37 @@ namespace GeometricLayoutsTests
         }
 
         [TestMethod]
-        public void When_LeftTriangleInputWidthIsValid_ReturnsRequestOk()
+        public void When_LeftFacingTriangle_IsIsoscelesRightTriangle()
         {
             ////Arrange
-            const int WIDTH = 10;
-
-            Point a = new Point(0, WIDTH);
-            Point b = new Point(0, 0);
-            Point c = new Point(WIDTH, WIDTH);
-
-            //Check Left facing
-            Triangle triangleLeft = new Triangle(a, b, c);
-            ////Act
-            ActionResult<string> response = _controller.Post(triangleLeft);
-            /// Assert
-            Assert.IsInstanceOfType(response.Result, typeof(OkObjectResult));
+            List<MapReference> validMapValues = ValidMapValuesForLeftTriangle();
+            
+            foreach (var leftFacingReference in validMapValues)
+            {
+                ////Act
+                //Check left facing
+                Triangle triangle = _triangleMapCalculator
+                    .CalculateCoordinatesFromMapReference(leftFacingReference);
+                /// Assert
+                Assert.IsTrue(triangle.IsIsoscelesRightTriangle());
+            }
         }
 
         [TestMethod]
-        public void When_RightTriangleInputWidthIsValid_ReturnsRequestOk()
+        public void When_RightFacingTriangle_IsIsoscelesRightTriangle()
         {
             ////Arrange
-            const int WIDTH = 10;
+            List<MapReference> validMapValues = ValidMapValuesForRightTriangle();
 
-            Point a = new Point(WIDTH, 0);
-            Point b = new Point(WIDTH, WIDTH);
-            Point c = new Point(0, 0);
-
-            //Check Right facing
-            Triangle triangleRight = new Triangle(a, b, c);
-            ////Act
-            ActionResult<string> response = _controller.Post(triangleRight);
-            /// Assert
-            Assert.IsInstanceOfType(response.Result, typeof(OkObjectResult));
+            foreach (var rightFacingReference in validMapValues)
+            {
+                ////Act
+                //Check right facing
+                Triangle triangle = _triangleMapCalculator
+                    .CalculateCoordinatesFromMapReference(rightFacingReference);
+                /// Assert
+                Assert.IsTrue(triangle.IsIsoscelesRightTriangle());
+            }
         }
     }
 }

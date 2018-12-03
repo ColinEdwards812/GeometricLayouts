@@ -6,6 +6,5 @@ namespace GeometricLayouts.Interfaces
     {
         Triangle CalculateCoordinatesFromMapReference(MapReference mapReference);
         MapReference CalculateMapReferenceFromCoordinates(Triangle t);
-        bool TriangleIsValid(Triangle t);
     }
 }

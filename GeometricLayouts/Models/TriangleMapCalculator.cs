@@ -11,25 +11,25 @@ namespace GeometricLayouts.Models
 
         public MapReference CalculateMapReferenceFromCoordinates(Triangle t)
         {
-            int xCharacter;
+            int xMappedInt;
             int yNumber;
 
             //If Vertex 3 > 2 we have a left triangle
             //else a right reflected triangle
             if (t.Vertex3.X > t.Vertex2.X)
             {
-                xCharacter = (t.Vertex1.Y / WIDTH) - 1;
+                xMappedInt = (t.Vertex1.Y / WIDTH) - 1;
                 yNumber = (t.Vertex1.X / WIDTH);
                 yNumber += yNumber + 1;
             }
             else
             {
-                xCharacter = (t.Vertex1.Y / WIDTH);
+                xMappedInt = (t.Vertex1.Y / WIDTH);
                 yNumber = (t.Vertex1.X / WIDTH);
                 yNumber += yNumber;
             }
 
-            char letter = CharacterMapping.ToMappedChar.First(v => v.Key == xCharacter).Value;
+            char letter = CharacterMapping.ToMappedChar.First(v => v.Key == xMappedInt).Value;
 
             return new MapReference(letter, yNumber);
         }
@@ -42,51 +42,28 @@ namespace GeometricLayouts.Models
                 ? mapReference.Number / 2 - 1
                 : mapReference.Number / 2;
 
-            //Create a square
+            //Create a square - we can create both triangles from this
             Point a = new Point(0, WIDTH);
             Point b = new Point(0, 0);
             Point c = new Point(WIDTH, WIDTH);
             Point d = new Point(WIDTH, 0);
 
+            Triangle t;
+
             //if mapReference.Number is odd then we have a left triangle
             //if mapReference.Number is even then we have a right reflected triangle
             if (mapReference.Number % 2 != 0)
             {
-                //Calculate offsets
-                Triangle t = new Triangle(a, b, c);
-                t.Offset(xOffset * WIDTH, yOffset * WIDTH);
-                return t;
+                t = new Triangle(a, b, c);             
             }
             else
             {
-                Triangle t = new Triangle(d, c, b);
-                t.Offset(xOffset * WIDTH, yOffset * WIDTH);
-                return t;
+                t = new Triangle(d, c, b);                
             }
-        }
 
-        public bool TriangleIsValid(Triangle t)
-        {
-            //If Vertex 3 > 2 we have a left triangle
-            //else a right reflected triangle
-            if (t.Vertex3.X > t.Vertex2.X)
-            {
-                bool isValid = (t.Vertex1.X == t.Vertex2.X)
-                               && (t.Vertex1.X == t.Vertex3.X - 10)
-                               && (t.Vertex1.Y == t.Vertex3.Y)
-                               && (t.Vertex1.Y == t.Vertex2.Y + 10);
-
-                return isValid;
-            }
-            else
-            {
-                bool isValid = (t.Vertex1.X == t.Vertex2.X)
-                               && (t.Vertex1.X == t.Vertex3.X + 10)
-                               && (t.Vertex1.Y == t.Vertex3.Y)
-                               && (t.Vertex1.Y == t.Vertex2.Y - 10);
-
-                return isValid;
-            }
+            //Apply offsets to move triangle to the correct coordinates
+            t.Offset(xOffset * WIDTH, yOffset * WIDTH);
+            return t;
         }
     }
 }
